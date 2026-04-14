@@ -2,176 +2,276 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Задача 5 — разрезание фигуры</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Карточки растений</title>
 <style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
-    font-family: sans-serif;
-    background: #f0f0f0;
+    font-family: 'Georgia', serif;
+    background: #f0f4f0;
+    min-height: 100vh;
+    padding: 32px 16px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 1.8rem;
+    color: #2d5a27;
+    margin-bottom: 8px;
+    font-weight: normal;
+    letter-spacing: 0.03em;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: #7a9e76;
+    font-size: 0.95rem;
+    margin-bottom: 32px;
+    font-style: italic;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .card-wrap {
+    perspective: 900px;
+    height: 160px;
+    cursor: pointer;
+  }
+
+  .card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+    border-radius: 14px;
+  }
+
+  .card-wrap:hover .card,
+  .card-wrap.flipped .card {
+    transform: rotateY(180deg);
+  }
+
+  .front, .back {
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 40px 20px;
-    gap: 40px;
-  }
-
-  h2 { margin: 0; color: #333; }
-  p  { margin: 0; color: #555; font-size: 0.95em; }
-
-  .label {
+    justify-content: center;
+    padding: 18px 16px;
     text-align: center;
-    margin-bottom: 6px;
+    box-shadow: 0 4px 18px rgba(45, 90, 39, 0.13), 0 1px 4px rgba(0,0,0,0.06);
   }
 
-  .grid-wrap {
-    display: inline-block;
-    border: 3px solid #222;
-    background: #fff;
+  .front {
+    background: linear-gradient(145deg, #ffffff, #eef5ec);
+    border: 1.5px solid #c8dec4;
   }
 
-  .row { display: flex; }
-
-  .cell {
-    width: 54px;
-    height: 54px;
-    border: 1px solid #bbb;
-    box-sizing: border-box;
-    position: relative;
+  .back {
+    background: linear-gradient(145deg, #2d5a27, #3d7a35);
+    transform: rotateY(180deg);
+    border: 1.5px solid #4a9040;
   }
 
-  /* filled figure cells */
-  .fig    { background: #fff; }
-  .empty  { background: #e8e8e8; }
-  .half-a { background: #aed6f1; }   /* синий — левая половина  */
-  .half-b { background: #a9dfbf; }   /* зелёный — правая половина */
-
-  /* толстые границы вдоль разреза */
-  .cut-right  { border-right:  3px solid #c0392b !important; }
-  .cut-bottom { border-bottom: 3px solid #c0392b !important; }
-  .cut-top    { border-top:    3px solid #c0392b !important; }
-
-  /* внешние границы фигуры */
-  .fig-top    { border-top:    2px solid #222; }
-  .fig-bottom { border-bottom: 2px solid #222; }
-  .fig-left   { border-left:   2px solid #222; }
-  .fig-right  { border-right:  2px solid #222; }
-
-  .legend {
-    display: flex;
-    gap: 24px;
-    font-size: 0.9em;
+  .front .label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #a8c5a0;
+    margin-bottom: 10px;
+    font-family: sans-serif;
   }
-  .legend-item { display: flex; align-items: center; gap: 8px; }
-  .swatch { width: 24px; height: 24px; border: 1px solid #999; border-radius: 3px; }
+
+  .front .name-ru {
+    font-size: 1.05rem;
+    color: #2d5a27;
+    font-weight: bold;
+    line-height: 1.35;
+  }
+
+  .front .leaf-icon {
+    font-size: 1.4rem;
+    margin-top: 12px;
+    opacity: 0.4;
+  }
+
+  .back .label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.13em;
+    color: #a8d9a0;
+    margin-bottom: 10px;
+    font-family: sans-serif;
+  }
+
+  .back .name-la {
+    font-size: 1rem;
+    color: #ffffff;
+    font-style: italic;
+    line-height: 1.4;
+  }
+
+  .back .number {
+    position: absolute;
+    bottom: 10px;
+    right: 14px;
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.3);
+    font-family: sans-serif;
+  }
+
+  .front .number {
+    position: absolute;
+    bottom: 10px;
+    right: 14px;
+    font-size: 0.65rem;
+    color: #c8dec4;
+    font-family: sans-serif;
+  }
+
+  .hint {
+    text-align: center;
+    color: #9ab896;
+    font-size: 0.82rem;
+    margin-bottom: 24px;
+    font-family: sans-serif;
+  }
+  .hint span { font-size: 1rem; }
+
+  .counter {
+    text-align: center;
+    color: #7a9e76;
+    font-size: 0.88rem;
+    margin-top: 36px;
+    font-family: sans-serif;
+  }
 </style>
 </head>
 <body>
 
-<h2>Задача 5 — разрежь фигуру на две равные части</h2>
+<h1>🌿 Растения</h1>
+<p class="subtitle">Русские и латинские названия</p>
+<p class="hint"><span>👆</span> Наведите или нажмите на карточку, чтобы увидеть латинское название</p>
 
-<!-- ИСХОДНАЯ ФИГУРА -->
-<div>
-  <div class="label"><strong>Исходная фигура (10 клеток)</strong></div>
-  <div class="grid-wrap" id="original"></div>
-</div>
-
-<!-- РАЗРЕЗАННАЯ ФИГУРА -->
-<div>
-  <div class="label"><strong>Разрез — две равные части по 5 клеток</strong><br>
-  <span style="color:#c0392b;font-weight:bold">красная линия — линия разреза</span></div>
-  <div class="grid-wrap" id="cut"></div>
-</div>
-
-<div class="legend">
-  <div class="legend-item"><div class="swatch" style="background:#aed6f1"></div> Часть А (5 клеток)</div>
-  <div class="legend-item"><div class="swatch" style="background:#a9dfbf"></div> Часть Б (5 клеток)</div>
-  <div class="legend-item"><div class="swatch" style="background:#e8e8e8"></div> Вне фигуры</div>
-</div>
+<div class="grid" id="grid"></div>
+<p class="counter" id="counter"></p>
 
 <script>
-/*
-  Сетка 8 × 4. Фигура:
+const plants = [
+  ["Калужница болотная", "Caltha palustris"],
+  ["Ветреница дубравная", "Anemone nemorosa"],
+  ["Лютик едкий", "Ranunculus acris"],
+  ["Лютик ползучий", "Ranunculus repens"],
+  ["Земляника лесная", "Fragaria vesca"],
+  ["Гравилат речной", "Geum rivale"],
+  ["Малина обыкновенная", "Rubus idaeus"],
+  ["Вишня обыкновенная", "Cerasus vulgaris"],
+  ["Черемуха обыкновенная", "Padus avium"],
+  ["Груша садовая", "Pyrus communis"],
+  ["Яблоня домашняя", "Malus domestica"],
+  ["Донник белый", "Melilotus albus"],
+  ["Горох посевной", "Pisum sativum"],
+  ["Вика посевная", "Vicia sativa"],
+  ["Вика мышиная", "Vicia cracca"],
+  ["Бобы конские", "Vicia faba"],
+  ["Чина луговая", "Lathyrus pratensis"],
+  ["Хлопчатник волосистый", "Gossypium hirsutum"],
+  ["Лен обыкновенный", "Linum usitatissimum"],
+  ["Морковь посевная", "Daucus sativus"],
+  ["Укроп пахучий", "Anethum graveolens"],
+  ["Тмин обыкновенный", "Carum carvi"],
+  ["Купырь лесной", "Anthriscus sylvestris"],
+  ["Сныть обыкновенная", "Aegopodium podagraria"],
+  ["Вех ядовитый", "Cicuta virosa"],
+  ["Картофель", "Solanum tuberosum"],
+  ["Томат", "Lycopersicon esculentum"],
+  ["Вьюнок полевой", "Convolvulus arvensis"],
+  ["Погремок осенний", "Rhinanthus serotinus"],
+  ["Пикульник красивый", "Galeopsis speciosa"],
+  ["Яснотка белая", "Lamium album"],
+  ["Будра плющевидная", "Glechoma hederacea"],
+  ["Крапива двудомная", "Urtica dioica"],
+  ["Щавель кислый", "Rumex acetosa"],
+  ["Спорыш птичий", "Polygonum aviculare"],
+  ["Гречиха посевная", "Fagopyrum esculentum"],
+  ["Свекла обыкновенная", "Beta vulgaris"],
+  ["Марь белая", "Chenopodium album"],
+  ["Звездчатка средняя", "Stellaria media"],
+  ["Мак самосейка", "Papaver rhoeas"],
+  ["Капуста огородная", "Brassica oleracea"],
+  ["Горчица полевая", "Sinapis arvensis"],
+  ["Сурепка обыкновенная", "Barbarea vulgaris"],
+  ["Редька посевная", "Raphanus sativus"],
+  ["Свербига восточная", "Bunias orientalis"],
+  ["Редька дикая", "Raphanus raphanistrum"],
+  ["Огурец посевной", "Cucumis sativus"],
+  ["Тыква обыкновенная", "Cucurbita pepo"],
+  ["Подсолнечник однолетний", "Helianthus annuus"],
+  ["Нивяник обыкновенный", "Leucanthemum vulgare"],
+  ["Полынь обыкновенная", "Artemisia vulgaris"],
+  ["Мать-и-мачеха", "Tussilago farfara"],
+  ["Бодяк полевой", "Cirsium arvense"],
+  ["Ромашка непахучая", "Matricaria perforata"],
+  ["Одуванчик лекарственный", "Taraxacum officinale"],
+  ["Василек синий", "Centaurea cyanus"],
+  ["Осот полевой", "Sonchus arvensis"],
+  ["Лук репчатый", "Allium cepa"],
+  ["Осока черная", "Carex nigra"],
+  ["Пшеница твердая", "Triticum durum"],
+  ["Пшеница мягкая", "Triticum aestivum"],
+  ["Кукуруза", "Zea mays"],
+  ["Овес посевной", "Avena sativa"],
+  ["Ячмень обыкновенный", "Hordeum vulgare"],
+  ["Рожь посевная", "Secale cereale"],
+  ["Пырей ползучий", "Elytrigia repens"],
+  ["Плевел многолетний", "Lolium perenne"],
+  ["Тимофеевка луговая", "Phleum pratense"],
+  ["Лисохвост луговой", "Alopecurus pratensis"],
+  ["Кострец безостый", "Bromopsis inermis"],
+  ["Овсяница луговая", "Festuca pratensis"],
+  ["Овсяница красная", "Festuca rubra"],
+  ["Полевица гигантская", "Agrostis gigantea"],
+  ["Ежа сборная", "Dactylis glomerata"],
+  ["Мятлик луговой", "Poa pratensis"],
+];
 
-  Col:  0  1  2  3  4  5  6  7
-  Row 0:  .  ■  ■  .  .  .  .  .
-  Row 1:  .  ■  ■  ■  ■  ■  ■  .
-  Row 2:  .  .  .  .  .  ■  ■  .
-  Row 3:  .  .  .  .  .  .  .  .
+const grid = document.getElementById('grid');
 
-  Левая  половина А: (0,1)(0,2)(1,1)(1,2)(1,3)  — L-пентомино
-  Правая половина Б: (1,4)(1,5)(1,6)(2,5)(2,6)  — L-пентомино (поворот 180°)
+plants.forEach(([ru, la], i) => {
+  const wrap = document.createElement('div');
+  wrap.className = 'card-wrap';
+  wrap.innerHTML = `
+    <div class="card">
+      <div class="front">
+        <div class="label">Русское название</div>
+        <div class="name-ru">${ru}</div>
+        <div class="leaf-icon">🌿</div>
+        <div class="number">${i + 1}</div>
+      </div>
+      <div class="back">
+        <div class="label">Латинское название</div>
+        <div class="name-la">${la}</div>
+        <div class="number">${i + 1}</div>
+      </div>
+    </div>`;
 
-  Разрез: вертикальный край между col 3 и col 4 в строке 1.
-*/
+  wrap.addEventListener('click', () => wrap.classList.toggle('flipped'));
+  grid.appendChild(wrap);
+});
 
-const ROWS = 4, COLS = 8;
-
-// true = клетка принадлежит фигуре
-const figSet = new Set([
-  '0,1','0,2',
-  '1,1','1,2','1,3','1,4','1,5','1,6',
-  '2,5','2,6'
-]);
-
-const halfA = new Set(['0,1','0,2','1,1','1,2','1,3']);
-const halfB = new Set(['1,4','1,5','1,6','2,5','2,6']);
-
-function key(r, c) { return `${r},${c}`; }
-function isFig(r, c) { return figSet.has(key(r, c)); }
-
-// Внешние границы фигуры (сосед — не фигура)
-function outerBorders(r, c) {
-  const cls = [];
-  if (!isFig(r-1, c)) cls.push('fig-top');
-  if (!isFig(r+1, c)) cls.push('fig-bottom');
-  if (!isFig(r, c-1)) cls.push('fig-left');
-  if (!isFig(r, c+1)) cls.push('fig-right');
-  return cls;
-}
-
-// Линия разреза: между (1,3) и (1,4) — правый край клетки (1,3)
-function cutBorders(r, c) {
-  const cls = [];
-  if (r === 1 && c === 3) cls.push('cut-right');
-  if (r === 1 && c === 4) cls.push('cut-top'); // нет — не нужно
-  return cls;
-}
-
-function buildGrid(containerId, showCut) {
-  const wrap = document.getElementById(containerId);
-  for (let r = 0; r < ROWS; r++) {
-    const row = document.createElement('div');
-    row.className = 'row';
-    for (let c = 0; c < COLS; c++) {
-      const cell = document.createElement('div');
-      const k = key(r, c);
-      const fig = figSet.has(k);
-
-      let colorClass = 'empty';
-      if (fig) {
-        if (showCut) {
-          colorClass = halfA.has(k) ? 'half-a' : 'half-b';
-        } else {
-          colorClass = 'fig';
-        }
-      }
-      cell.className = 'cell ' + colorClass;
-
-      if (fig) {
-        outerBorders(r, c).forEach(b => cell.classList.add(b));
-      }
-
-      if (showCut && fig) {
-        cutBorders(r, c).forEach(b => cell.classList.add(b));
-      }
-
-      row.appendChild(cell);
-    }
-    wrap.appendChild(row);
-  }
-}
-
-buildGrid('original', false);
-buildGrid('cut', true);
+document.getElementById('counter').textContent = `Всего карточек: ${plants.length}`;
 </script>
 </body>
 </html>
