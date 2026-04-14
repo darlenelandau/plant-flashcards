@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Задача 5 — разрезание фигуры</title>
+<style>
+  body {
+    font-family: sans-serif;
+    background: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    gap: 40px;
+  }
+
+  h2 { margin: 0; color: #333; }
+  p  { margin: 0; color: #555; font-size: 0.95em; }
+
+  .label {
+    text-align: center;
+    margin-bottom: 6px;
+  }
+
+  .grid-wrap {
+    display: inline-block;
+    border: 3px solid #222;
+    background: #fff;
+  }
+
+  .row { display: flex; }
+
+  .cell {
+    width: 54px;
+    height: 54px;
+    border: 1px solid #bbb;
+    box-sizing: border-box;
+    position: relative;
+  }
+
+  /* filled figure cells */
+  .fig    { background: #fff; }
+  .empty  { background: #e8e8e8; }
+  .half-a { background: #aed6f1; }   /* синий — левая половина  */
+  .half-b { background: #a9dfbf; }   /* зелёный — правая половина */
+
+  /* толстые границы вдоль разреза */
+  .cut-right  { border-right:  3px solid #c0392b !important; }
+  .cut-bottom { border-bottom: 3px solid #c0392b !important; }
+  .cut-top    { border-top:    3px solid #c0392b !important; }
+
+  /* внешние границы фигуры */
+  .fig-top    { border-top:    2px solid #222; }
+  .fig-bottom { border-bottom: 2px solid #222; }
+  .fig-left   { border-left:   2px solid #222; }
+  .fig-right  { border-right:  2px solid #222; }
+
+  .legend {
+    display: flex;
+    gap: 24px;
+    font-size: 0.9em;
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; }
+  .swatch { width: 24px; height: 24px; border: 1px solid #999; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<h2>Задача 5 — разрежь фигуру на две равные части</h2>
+
+<!-- ИСХОДНАЯ ФИГУРА -->
+<div>
+  <div class="label"><strong>Исходная фигура (10 клеток)</strong></div>
+  <div class="grid-wrap" id="original"></div>
+</div>
+
+<!-- РАЗРЕЗАННАЯ ФИГУРА -->
+<div>
+  <div class="label"><strong>Разрез — две равные части по 5 клеток</strong><br>
+  <span style="color:#c0392b;font-weight:bold">красная линия — линия разреза</span></div>
+  <div class="grid-wrap" id="cut"></div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="swatch" style="background:#aed6f1"></div> Часть А (5 клеток)</div>
+  <div class="legend-item"><div class="swatch" style="background:#a9dfbf"></div> Часть Б (5 клеток)</div>
+  <div class="legend-item"><div class="swatch" style="background:#e8e8e8"></div> Вне фигуры</div>
+</div>
+
+<script>
+/*
+  Сетка 8 × 4. Фигура:
+
+  Col:  0  1  2  3  4  5  6  7
+  Row 0:  .  ■  ■  .  .  .  .  .
+  Row 1:  .  ■  ■  ■  ■  ■  ■  .
+  Row 2:  .  .  .  .  .  ■  ■  .
+  Row 3:  .  .  .  .  .  .  .  .
+
+  Левая  половина А: (0,1)(0,2)(1,1)(1,2)(1,3)  — L-пентомино
+  Правая половина Б: (1,4)(1,5)(1,6)(2,5)(2,6)  — L-пентомино (поворот 180°)
+
+  Разрез: вертикальный край между col 3 и col 4 в строке 1.
+*/
+
+const ROWS = 4, COLS = 8;
+
+// true = клетка принадлежит фигуре
+const figSet = new Set([
+  '0,1','0,2',
+  '1,1','1,2','1,3','1,4','1,5','1,6',
+  '2,5','2,6'
+]);
+
+const halfA = new Set(['0,1','0,2','1,1','1,2','1,3']);
+const halfB = new Set(['1,4','1,5','1,6','2,5','2,6']);
+
+function key(r, c) { return `${r},${c}`; }
+function isFig(r, c) { return figSet.has(key(r, c)); }
+
+// Внешние границы фигуры (сосед — не фигура)
+function outerBorders(r, c) {
+  const cls = [];
+  if (!isFig(r-1, c)) cls.push('fig-top');
+  if (!isFig(r+1, c)) cls.push('fig-bottom');
+  if (!isFig(r, c-1)) cls.push('fig-left');
+  if (!isFig(r, c+1)) cls.push('fig-right');
+  return cls;
+}
+
+// Линия разреза: между (1,3) и (1,4) — правый край клетки (1,3)
+function cutBorders(r, c) {
+  const cls = [];
+  if (r === 1 && c === 3) cls.push('cut-right');
+  if (r === 1 && c === 4) cls.push('cut-top'); // нет — не нужно
+  return cls;
+}
+
+function buildGrid(containerId, showCut) {
+  const wrap = document.getElementById(containerId);
+  for (let r = 0; r < ROWS; r++) {
+    const row = document.createElement('div');
+    row.className = 'row';
+    for (let c = 0; c < COLS; c++) {
+      const cell = document.createElement('div');
+      const k = key(r, c);
+      const fig = figSet.has(k);
+
+      let colorClass = 'empty';
+      if (fig) {
+        if (showCut) {
+          colorClass = halfA.has(k) ? 'half-a' : 'half-b';
+        } else {
+          colorClass = 'fig';
+        }
+      }
+      cell.className = 'cell ' + colorClass;
+
+      if (fig) {
+        outerBorders(r, c).forEach(b => cell.classList.add(b));
+      }
+
+      if (showCut && fig) {
+        cutBorders(r, c).forEach(b => cell.classList.add(b));
+      }
+
+      row.appendChild(cell);
+    }
+    wrap.appendChild(row);
+  }
+}
+
+buildGrid('original', false);
+buildGrid('cut', true);
+</script>
+</body>
+</html>
