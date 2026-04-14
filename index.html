@@ -27,13 +27,13 @@
     text-align: center;
     color: #7a9e76;
     font-size: 0.95rem;
-    margin-bottom: 32px;
+    margin-bottom: 16px;
     font-style: italic;
   }
 
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 20px;
     max-width: 1300px;
     margin: 0 auto;
@@ -41,7 +41,7 @@
 
   .card-wrap {
     perspective: 900px;
-    height: 160px;
+    height: 300px;
     cursor: pointer;
   }
 
@@ -54,7 +54,6 @@
     border-radius: 14px;
   }
 
-  .card-wrap:hover .card,
   .card-wrap.flipped .card {
     transform: rotateY(180deg);
   }
@@ -68,43 +67,61 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 18px 16px;
+    padding: 14px 14px 18px;
     text-align: center;
     box-shadow: 0 4px 18px rgba(45, 90, 39, 0.13), 0 1px 4px rgba(0,0,0,0.06);
+    overflow: hidden;
   }
 
   .front {
     background: linear-gradient(145deg, #ffffff, #eef5ec);
     border: 1.5px solid #c8dec4;
+    justify-content: flex-start;
   }
 
   .back {
     background: linear-gradient(145deg, #2d5a27, #3d7a35);
     transform: rotateY(180deg);
     border: 1.5px solid #4a9040;
+    justify-content: center;
+  }
+
+  .front .plant-img {
+    width: 100%;
+    height: 170px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    background: #e0ebe0;
+  }
+
+  .front .no-img {
+    width: 100%;
+    height: 170px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    opacity: 0.25;
+    background: #e8f0e6;
+    border-radius: 8px;
+    margin-bottom: 12px;
   }
 
   .front .label {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     text-transform: uppercase;
     letter-spacing: 0.12em;
     color: #a8c5a0;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
     font-family: sans-serif;
   }
 
   .front .name-ru {
-    font-size: 1.05rem;
+    font-size: 1rem;
     color: #2d5a27;
     font-weight: bold;
-    line-height: 1.35;
-  }
-
-  .front .leaf-icon {
-    font-size: 1.4rem;
-    margin-top: 12px;
-    opacity: 0.4;
+    line-height: 1.3;
   }
 
   .back .label {
@@ -117,29 +134,22 @@
   }
 
   .back .name-la {
-    font-size: 1rem;
+    font-size: 1.15rem;
     color: #ffffff;
     font-style: italic;
     line-height: 1.4;
+    padding: 0 10px;
   }
 
-  .back .number {
+  .number {
     position: absolute;
-    bottom: 10px;
-    right: 14px;
+    bottom: 8px;
+    right: 12px;
     font-size: 0.65rem;
-    color: rgba(255,255,255,0.3);
     font-family: sans-serif;
   }
-
-  .front .number {
-    position: absolute;
-    bottom: 10px;
-    right: 14px;
-    font-size: 0.65rem;
-    color: #c8dec4;
-    font-family: sans-serif;
-  }
+  .front .number { color: #c8dec4; }
+  .back  .number { color: rgba(255,255,255,0.35); }
 
   .hint {
     text-align: center;
@@ -148,7 +158,6 @@
     margin-bottom: 24px;
     font-family: sans-serif;
   }
-  .hint span { font-size: 1rem; }
 
   .counter {
     text-align: center;
@@ -163,7 +172,7 @@
 
 <h1>🌿 Растения</h1>
 <p class="subtitle">Русские и латинские названия</p>
-<p class="hint"><span>👆</span> Наведите или нажмите на карточку, чтобы увидеть латинское название</p>
+<p class="hint">Нажмите на карточку, чтобы увидеть латинское название</p>
 
 <div class="grid" id="grid"></div>
 <p class="counter" id="counter"></p>
@@ -178,7 +187,7 @@ const plants = [
   ["Гравилат речной", "Geum rivale"],
   ["Малина обыкновенная", "Rubus idaeus"],
   ["Вишня обыкновенная", "Cerasus vulgaris"],
-  ["Черемуха обыкновенная", "Padus avium"],
+  ["Черёмуха обыкновенная", "Padus avium"],
   ["Груша садовая", "Pyrus communis"],
   ["Яблоня домашняя", "Malus domestica"],
   ["Донник белый", "Melilotus albus"],
@@ -188,7 +197,7 @@ const plants = [
   ["Бобы конские", "Vicia faba"],
   ["Чина луговая", "Lathyrus pratensis"],
   ["Хлопчатник волосистый", "Gossypium hirsutum"],
-  ["Лен обыкновенный", "Linum usitatissimum"],
+  ["Лён обыкновенный", "Linum usitatissimum"],
   ["Морковь посевная", "Daucus sativus"],
   ["Укроп пахучий", "Anethum graveolens"],
   ["Тмин обыкновенный", "Carum carvi"],
@@ -206,7 +215,7 @@ const plants = [
   ["Щавель кислый", "Rumex acetosa"],
   ["Спорыш птичий", "Polygonum aviculare"],
   ["Гречиха посевная", "Fagopyrum esculentum"],
-  ["Свекла обыкновенная", "Beta vulgaris"],
+  ["Свёкла обыкновенная", "Beta vulgaris"],
   ["Марь белая", "Chenopodium album"],
   ["Звездчатка средняя", "Stellaria media"],
   ["Мак самосейка", "Papaver rhoeas"],
@@ -225,14 +234,14 @@ const plants = [
   ["Бодяк полевой", "Cirsium arvense"],
   ["Ромашка непахучая", "Matricaria perforata"],
   ["Одуванчик лекарственный", "Taraxacum officinale"],
-  ["Василек синий", "Centaurea cyanus"],
+  ["Василёк синий", "Centaurea cyanus"],
   ["Осот полевой", "Sonchus arvensis"],
   ["Лук репчатый", "Allium cepa"],
-  ["Осока черная", "Carex nigra"],
-  ["Пшеница твердая", "Triticum durum"],
+  ["Осока чёрная", "Carex nigra"],
+  ["Пшеница твёрдая", "Triticum durum"],
   ["Пшеница мягкая", "Triticum aestivum"],
   ["Кукуруза", "Zea mays"],
-  ["Овес посевной", "Avena sativa"],
+  ["Овёс посевной", "Avena sativa"],
   ["Ячмень обыкновенный", "Hordeum vulgare"],
   ["Рожь посевная", "Secale cereale"],
   ["Пырей ползучий", "Elytrigia repens"],
@@ -247,17 +256,38 @@ const plants = [
   ["Мятлик луговой", "Poa pratensis"],
 ];
 
+// Set of Latin names that have an image in images/<slug>.jpg
+const withImage = new Set([
+  "Caltha palustris","Anemone nemorosa","Ranunculus acris","Ranunculus repens",
+  "Fragaria vesca","Geum rivale","Rubus idaeus","Cerasus vulgaris","Pyrus communis",
+  "Malus domestica","Melilotus albus","Pisum sativum","Vicia sativa","Vicia cracca",
+  "Vicia faba","Daucus sativus","Anethum graveolens","Carum carvi","Anthriscus sylvestris",
+  "Aegopodium podagraria","Solanum tuberosum","Lycopersicon esculentum","Fagopyrum esculentum",
+  "Brassica oleracea","Barbarea vulgaris","Raphanus sativus","Bunias orientalis",
+  "Helianthus annuus","Leucanthemum vulgare","Artemisia vulgaris","Tussilago farfara",
+  "Cirsium arvense","Matricaria perforata","Taraxacum officinale","Centaurea cyanus",
+  "Sonchus arvensis","Triticum durum","Triticum aestivum","Zea mays","Avena sativa",
+  "Hordeum vulgare","Secale cereale","Elytrigia repens","Lolium perenne","Phleum pratense",
+  "Alopecurus pratensis","Bromopsis inermis","Festuca pratensis","Dactylis glomerata",
+  "Poa pratensis","Agrostis gigantea"
+]);
+
 const grid = document.getElementById('grid');
 
 plants.forEach(([ru, la], i) => {
   const wrap = document.createElement('div');
   wrap.className = 'card-wrap';
+  const slug = la.toLowerCase().replace(/ /g, '-');
+  const imgHtml = withImage.has(la)
+    ? `<img class="plant-img" src="images/${slug}.jpg" alt="${la}" loading="lazy">`
+    : `<div class="no-img">🌿</div>`;
+
   wrap.innerHTML = `
     <div class="card">
       <div class="front">
+        ${imgHtml}
         <div class="label">Русское название</div>
         <div class="name-ru">${ru}</div>
-        <div class="leaf-icon">🌿</div>
         <div class="number">${i + 1}</div>
       </div>
       <div class="back">
