@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Карточки для зачёта</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Georgia', serif;
+    background: #f0f4f0;
+    min-height: 100vh;
+    padding: 32px 16px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 1.8rem;
+    color: #2d5a27;
+    margin-bottom: 8px;
+    font-weight: normal;
+    letter-spacing: 0.03em;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: #7a9e76;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+
+  .nav {
+    text-align: center;
+    margin-bottom: 24px;
+    font-family: sans-serif;
+    font-size: 0.9rem;
+  }
+  .nav a {
+    color: #2d5a27;
+    text-decoration: none;
+    border-bottom: 1px dashed #7a9e76;
+    padding-bottom: 1px;
+  }
+  .nav a:hover { border-bottom-style: solid; }
+
+  .hint {
+    text-align: center;
+    color: #9ab896;
+    font-size: 0.82rem;
+    margin-bottom: 24px;
+    font-family: sans-serif;
+  }
+
+  .family-title {
+    max-width: 1300px;
+    margin: 32px auto 16px;
+    font-size: 1.15rem;
+    color: #3d7a35;
+    font-weight: bold;
+    padding-left: 4px;
+    font-family: sans-serif;
+  }
+  .family-title:first-of-type { margin-top: 0; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .card-wrap {
+    perspective: 900px;
+    height: 300px;
+    cursor: pointer;
+  }
+
+  .card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+    border-radius: 14px;
+  }
+
+  .card-wrap.flipped .card {
+    transform: rotateY(180deg);
+  }
+
+  .front, .back {
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 14px 14px 18px;
+    text-align: center;
+    box-shadow: 0 4px 18px rgba(45, 90, 39, 0.13), 0 1px 4px rgba(0,0,0,0.06);
+    overflow: hidden;
+  }
+
+  .front {
+    background: linear-gradient(145deg, #ffffff, #eef5ec);
+    border: 1.5px solid #c8dec4;
+    justify-content: flex-start;
+  }
+
+  .back {
+    background: linear-gradient(145deg, #2d5a27, #3d7a35);
+    transform: rotateY(180deg);
+    border: 1.5px solid #4a9040;
+    justify-content: center;
+  }
+
+  .front .plant-img {
+    width: 100%;
+    height: 170px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    background: #e0ebe0;
+  }
+
+  .front .no-img {
+    width: 100%;
+    height: 170px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    opacity: 0.25;
+    background: #e8f0e6;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+
+  .front .label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #a8c5a0;
+    margin-bottom: 6px;
+    font-family: sans-serif;
+  }
+
+  .front .name-ru {
+    font-size: 1rem;
+    color: #2d5a27;
+    font-weight: bold;
+    line-height: 1.3;
+  }
+
+  .back .label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.13em;
+    color: #a8d9a0;
+    margin-bottom: 10px;
+    font-family: sans-serif;
+  }
+
+  .back .name-la {
+    font-size: 1.15rem;
+    color: #ffffff;
+    font-style: italic;
+    line-height: 1.4;
+    padding: 0 10px;
+  }
+
+  .number {
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    font-size: 0.65rem;
+    font-family: sans-serif;
+  }
+  .front .number { color: #c8dec4; }
+  .back  .number { color: rgba(255,255,255,0.35); }
+
+  .counter {
+    text-align: center;
+    color: #7a9e76;
+    font-size: 0.88rem;
+    margin-top: 36px;
+    font-family: sans-serif;
+  }
+</style>
+</head>
+<body>
+
+<h1>🌿 Карточки для зачёта</h1>
+<p class="subtitle">Розовые, Сельдерейные, Паслёновые, Капустные</p>
+<p class="nav"><a href="index.html">← Все растения</a></p>
+<p class="hint">Нажмите на карточку, чтобы увидеть латинское название</p>
+
+<div id="content"></div>
+<p class="counter" id="counter"></p>
+
+<script>
+const families = [
+  {
+    name: "Розовые — Rosaceae",
+    plants: [
+      ["Гравилат речной", "Geum rivale"],
+      ["Малина обыкновенная", "Rubus idaeus"],
+      ["Яблоня домашняя", "Malus domestica"],
+      ["Земляника лесная", "Fragaria vesca"],
+      ["Груша обыкновенная", "Pyrus communis"],
+      ["Вишня обыкновенная", "Cerasus vulgaris"],
+    ]
+  },
+  {
+    name: "Сельдерейные — Apiaceae",
+    plants: [
+      ["Тмин обыкновенный", "Carum carvi"],
+      ["Морковь посевная", "Daucus sativus"],
+      ["Укроп пахучий", "Anethum graveolens"],
+      ["Сныть обыкновенная", "Aegopodium podagraria"],
+      ["Купырь лесной", "Anthriscus sylvestris"],
+      ["Вех ядовитый", "Cicuta virosa"],
+    ]
+  },
+  {
+    name: "Паслёновые — Solanaceae",
+    plants: [
+      ["Томат", "Lycopersicon esculentum"],
+      ["Картофель", "Solanum tuberosum"],
+    ]
+  },
+  {
+    name: "Капустные — Brassicaceae",
+    plants: [
+      ["Капуста огородная", "Brassica oleracea"],
+      ["Сурепка обыкновенная", "Barbarea vulgaris"],
+      ["Редька посевная", "Raphanus sativus"],
+      ["Свербига восточная", "Bunias orientalis"],
+    ]
+  }
+];
+
+const withImage = new Set([
+  "Geum rivale","Rubus idaeus","Malus domestica","Fragaria vesca",
+  "Pyrus communis","Cerasus vulgaris","Carum carvi","Daucus sativus",
+  "Anethum graveolens","Aegopodium podagraria","Anthriscus sylvestris",
+  "Lycopersicon esculentum","Solanum tuberosum","Brassica oleracea",
+  "Barbarea vulgaris","Raphanus sativus","Bunias orientalis"
+]);
+
+const content = document.getElementById('content');
+let total = 0;
+
+families.forEach(fam => {
+  const title = document.createElement('div');
+  title.className = 'family-title';
+  title.textContent = fam.name;
+  content.appendChild(title);
+
+  const grid = document.createElement('div');
+  grid.className = 'grid';
+  content.appendChild(grid);
+
+  fam.plants.forEach(([ru, la]) => {
+    total++;
+    const wrap = document.createElement('div');
+    wrap.className = 'card-wrap';
+    const slug = la.toLowerCase().replace(/ /g, '-');
+    const imgHtml = withImage.has(la)
+      ? `<img class="plant-img" src="images/${slug}.jpg" alt="${la}" loading="lazy">`
+      : `<div class="no-img">🌿</div>`;
+
+    wrap.innerHTML = `
+      <div class="card">
+        <div class="front">
+          ${imgHtml}
+          <div class="label">Русское название</div>
+          <div class="name-ru">${ru}</div>
+          <div class="number">${total}</div>
+        </div>
+        <div class="back">
+          <div class="label">Латинское название</div>
+          <div class="name-la">${la}</div>
+          <div class="number">${total}</div>
+        </div>
+      </div>`;
+
+    wrap.addEventListener('click', () => wrap.classList.toggle('flipped'));
+    grid.appendChild(wrap);
+  });
+});
+
+document.getElementById('counter').textContent = `Всего карточек: ${total}`;
+</script>
+</body>
+</html>
